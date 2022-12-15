@@ -1,21 +1,26 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore;
 using TodoList.Blazor.Data;
+using TodoList.Infrastructure;
+using TodoList.Services.Areas;
+using TodoList.Services.Areas.Items;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddDbContext<TodoListContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("TodoListDatabase")));
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+
+builder.Services.AddAutoMapper(typeof(EntityDto));
+
+builder.Services.AddTransient<IItemService, ItemService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
