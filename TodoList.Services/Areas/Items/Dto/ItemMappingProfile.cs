@@ -9,5 +9,6 @@ public class ItemMappingProfile : Profile
     {
         CreateMap<ItemDtoInput, Item>();
         CreateMap<Item, ItemDto>();
+        CreateMap<ItemDto, ItemDtoInput>();
     }
 }
