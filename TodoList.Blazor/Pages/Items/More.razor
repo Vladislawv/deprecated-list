@@ -1,0 +1,44 @@
+﻿@page "/items/{Id:int}"
+
+@inject IItemService ItemService
+
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th></th>
+        <th>Data</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>@_item.Id</td>
+        <td><i class="@GetIconClass(_item.IsCompleted)"></i></td>
+        <td>@_item.Data</td>
+    </tr>
+    </tbody>
+</table>
+<br/>
+<br/>
+
+<a href="/"><button class="btn btn-info"><i class="bi bi-arrow-bar-left"></i></button></a>
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+
+    ItemDto _item = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _item = await ItemService.GetByIdAsync(Id);
+    }
+    
+    private string GetIconClass(bool isCompleted)
+    {
+        var iconClass = isCompleted ? "bi bi-check-square-fill" : "bi bi-check-square";
+
+        return iconClass;
+    }
+}

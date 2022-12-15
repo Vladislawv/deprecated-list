@@ -1,9 +1,134 @@
 ﻿@page "/"
 
+@inject IJSRuntime Js
+@inject NavigationManager NavManager
+@inject IItemService ItemService
+
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Welcome to Todo-List !</h1>
+<h2>Here you can manage your items</h2>
+<ul>
+    <li>Mark item as done</li>
+    <li>Search item by ID</li>
+    <li>Add item to list</li>
+    <li>Update item</li>
+    <li>Delete/archive item from list</li>
+    <li>See your archive items and manage them</li>
+</ul>
 
-Welcome to your new app.
+@if (_items == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <EditForm Model="_itemId">
+        <label for="itemId">Id</label>
+        <InputNumber class="text-center" id="itemId" @bind-Value="_itemId"></InputNumber>
+        
+        <button @onclick="GetByIdAsync"><i class="bi bi-search"></i></button>
+        <br/>
+        <br/>
+    </EditForm>
+    <EditForm Model="_itemInput">
+        <div class="text-center">
+            <table class="w-100">
+                <thead>
+                <tr>
+                    <th>
+                        <div>
+                            <label for="data">New Item</label>
+                            <InputText class="form-control w-100" id="data" @bind-Value="_itemInput.Data"></InputText>
+                        </div>
+                    </th>
+                    <th><button class="btn btn-success" @onclick="CreateAsync">Add</button></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <br/>
+        <br/>
 
-<SurveyPrompt Title="How is Blazor working for you?"/>
+        <h2 for="table">Current items:</h2>
+        <table class="table table-bordered table-striped" id="table">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th></th>
+                <th>Data</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in _items)
+                {
+                    <tr>
+                        <td>
+                            @item.Id
+                        </td>
+                        <td>
+                            <i class="@GetIconClass(item.IsCompleted)"></i>
+                        </td>
+                        <td>
+                            @if(item.IsCompleted) {<strike>@item.Data</strike>}
+                            else {@item.Data}
+                        </td>
+                        <td><a href="/items/edit/@item.Id"><button class="btn btn-primary"><i class="bi bi-pencil-square"></i></button></a></td>
+                        <td><button class="btn btn-danger" @onclick="() => DeleteByIdAsync(item.Id)"><i class="bi bi-trash-fill"></i></button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </EditForm>
+}
+
+@code
+{
+    int _itemId;
+    readonly ItemDtoInput _itemInput = new(){Data = "type text"};
+    IList<ItemDto>? _items;
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        _items = await ItemService.GetListAsync();
+    }
+
+    private async Task GetByIdAsync()
+    {
+        try
+        {
+            await ItemService.GetByIdAsync(_itemId);
+            NavManager.NavigateTo($"/items/{_itemId}");
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+    
+    private async Task CreateAsync()
+    {
+        await ItemService.CreateAsync(_itemInput);
+        
+        _items = await ItemService.GetListAsync();
+    }
+
+    private async Task DeleteByIdAsync(int id)
+    {
+        await ItemService.DeleteByIdAsync(id);
+        
+        _items = await ItemService.GetListAsync();
+    }
+
+    private string GetIconClass(bool isCompleted)
+    {
+        var iconClass = isCompleted ? "bi bi-check-square-fill" : "bi bi-check-square";
+
+        return iconClass;
+    }
+}

@@ -1,0 +1,54 @@
+﻿@page "/items/edit/{Id:int}"
+
+@inject IJSRuntime Js
+@inject NavigationManager NavigationManager
+@inject IItemService ItemService
+@inject IMapper Mapper
+
+<EditForm Model="_itemInput">
+    <button @onclick="() => _itemInput.IsCompleted = !_itemInput.IsCompleted">
+        <i class="@GetIconClass(_itemInput.IsCompleted)"></i>
+    </button>
+    <br/>
+    <br/>
+    
+    <label for="Data">Data</label>
+    <InputText class="text-center" id="Data" @bind-Value="_itemInput.Data"></InputText>
+    <br/>
+    <br/>
+    
+    <div class="text-center">
+        <a href="/"><button class="btn-info"><i class="bi bi-arrow-bar-left"></i></button></a>
+        <button class="btn-primary" @onclick="UpdateAsync"><i class="bi bi-pencil-square"></i></button>
+    </div>
+</EditForm>
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+
+    readonly ItemDtoInput? _itemInput = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var itemDto = await ItemService.GetByIdAsync(Id);
+        Mapper.Map(itemDto, _itemInput);
+    }
+
+    private async Task UpdateAsync()
+    {
+        await ItemService.UpdateByIdAsync(Id, _itemInput);
+
+        await Js.InvokeVoidAsync("alert", "Successfully!");
+        
+        NavigationManager.NavigateTo("/");
+    }
+    
+    private string GetIconClass(bool isCompleted)
+    {
+        var iconClass = isCompleted ? "bi bi-check-square-fill" : "bi bi-check-square";
+
+        return iconClass;
+    }
+}

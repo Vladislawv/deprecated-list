@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using TodoList.Blazor.Data;
 using TodoList.Infrastructure;
 using TodoList.Services.Areas;
 using TodoList.Services.Areas.Items;
