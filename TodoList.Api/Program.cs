@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using TodoList.Api.Middlewares;
 using TodoList.Infrastructure;
+using TodoList.Services.Areas;
+using TodoList.Services.Areas.Items;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +12,12 @@ builder.Services.AddDbContext<TodoListContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TodoListDatabase")));
 
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddAutoMapper(typeof(EntityDto));
+
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddTransient<IItemService, ItemService>();
 
 var app = builder.Build();
 
