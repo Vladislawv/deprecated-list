@@ -79,4 +79,13 @@ a, .btn-link {
 
 .btn-success {
     margin-top: 8%;
+    color: #00ff4e;
+}
+
+.background-white{
+    background-color: white;
+}
+
+.m-t-10{
+    margin-top: 10%;
 }

@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using TodoList.Infrastructure;
 using TodoList.Infrastructure.Entities;
+using TodoList.Services.Areas.Archive;
 using TodoList.Services.Areas.Items.Dto;
 
 namespace TodoList.Services.Areas.Items;
@@ -11,11 +12,13 @@ public class ItemService : IItemService
 {
     private readonly TodoListContext _context;
     private readonly IMapper _mapper;
+    private readonly IArchiveService _archiveService;
 
-    public ItemService(TodoListContext context, IMapper mapper)
+    public ItemService(TodoListContext context, IMapper mapper, IArchiveService archiveService)
     {
         _context = context;
         _mapper = mapper;
+        _archiveService = archiveService;
     }
 
     public async Task<IList<ItemDto>> GetListAsync()
@@ -66,8 +69,7 @@ public class ItemService : IItemService
         var item = await _context.Items
             .FirstOrDefaultAsync(i => i.Id == id)
                 ?? throw new Exception($"Item with Id:{id} is not found !");
-
-        _context.Items.Remove(item);
-        await _context.SaveChangesAsync();
+        
+        await _archiveService.ArchiveAsync(item);
     }
 }
