@@ -1,0 +1,86 @@
+﻿@page "/archive/items"
+
+@inject IJSRuntime Js
+@inject IArchiveService ArchiveService
+
+@if (_items == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>    
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th></th>
+            <th>Data</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in _items)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td><i class="@GetIconClass(item.IsCompleted)"></i></td>
+                <td>
+                    @if(item.IsCompleted) {<strike>@item.Data</strike>}
+                    else {@item.Data}
+                </td>
+                <td>
+                    <button class="btn btn-info" @onclick="() => UnArchiveByIdAsync(item.Id)">Unarchive</button>
+                </td>
+                <td>
+                    <button class="btn btn-danger" @onclick="() => DeleteByIdAsync(item.Id)">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <br/>
+    <br/>
+}
+
+
+<a href="/"><button class="btn btn-info"><i class="bi bi-arrow-bar-left"></i></button></a>
+
+@code
+{
+    IList<ArchivedDto>? _items;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _items = await ArchiveService.GetListAsync();
+    }
+
+    private async Task UnArchiveByIdAsync(int id)
+    {
+        await ArchiveService.UnArchiveByIdAsync(id);
+
+        _items = await ArchiveService.GetListAsync();
+
+        await Js.InvokeVoidAsync("alert", "Item unarchived successfully.");
+    }
+
+    private async Task DeleteByIdAsync(int id)
+    {
+        await ArchiveService.DeleteByIdAsync(id);
+
+        _items = await ArchiveService.GetListAsync();
+
+        await Js.InvokeVoidAsync("alert", "Item deleted successfully.");
+    }
+
+    private string GetIconClass(bool isCompleted)
+    {
+        var iconClass = isCompleted ? "bi bi-check-square-fill" : "bi bi-check-square";
+
+        return iconClass;
+    }
+}

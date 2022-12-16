@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TodoList.Infrastructure;
 using TodoList.Services.Areas;
+using TodoList.Services.Areas.Archive;
 using TodoList.Services.Areas.Items;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,8 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddAutoMapper(typeof(EntityDto));
 
 builder.Services.AddTransient<IItemService, ItemService>();
+
+builder.Services.AddTransient<IArchiveService, ArchiveService>();
 
 var app = builder.Build();
 

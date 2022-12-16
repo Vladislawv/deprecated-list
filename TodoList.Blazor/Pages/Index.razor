@@ -14,7 +14,7 @@
     <li>Add item to list</li>
     <li>Update item</li>
     <li>Delete/archive item from list</li>
-    <li>See your archive items and manage them</li>
+    <li>See your archived items and manage them</li>
 </ul>
 
 @if (_items == null)
@@ -27,12 +27,13 @@ else
 {
     <EditForm Model="_itemId">
         <label for="itemId">Id</label>
-        <InputNumber class="text-center" id="itemId" @bind-Value="_itemId"></InputNumber>
-        
-        <button @onclick="GetByIdAsync"><i class="bi bi-search"></i></button>
+        <InputNumber class="form-control w-25" id="itemId" @bind-Value="_itemId"></InputNumber>
+
+        <button class="btn btn-info" @onclick="GetByIdAsync"><i class="bi bi-search"></i></button>
         <br/>
         <br/>
     </EditForm>
+    
     <EditForm Model="_itemInput">
         <div class="text-center">
             <table class="w-100">
@@ -77,8 +78,16 @@ else
                             @if(item.IsCompleted) {<strike>@item.Data</strike>}
                             else {@item.Data}
                         </td>
-                        <td><a href="/items/edit/@item.Id"><button class="btn btn-primary"><i class="bi bi-pencil-square"></i></button></a></td>
-                        <td><button class="btn btn-danger" @onclick="() => DeleteByIdAsync(item.Id)"><i class="bi bi-trash-fill"></i></button></td>
+                        <td>
+                            <a href="/items/edit/@item.Id">
+                                <button class="btn btn-primary"><i class="bi bi-pencil-square"></i></button>
+                            </a>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => DeleteByIdAsync(item.Id)">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -116,6 +125,8 @@ else
         await ItemService.CreateAsync(_itemInput);
         
         _items = await ItemService.GetListAsync();
+
+        await Js.InvokeVoidAsync("alert", "Item created successfully.");
     }
 
     private async Task DeleteByIdAsync(int id)
@@ -123,6 +134,8 @@ else
         await ItemService.DeleteByIdAsync(id);
         
         _items = await ItemService.GetListAsync();
+
+        await Js.InvokeVoidAsync("alert", "Item added to archive.");
     }
 
     private string GetIconClass(bool isCompleted)

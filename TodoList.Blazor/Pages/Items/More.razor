@@ -14,7 +14,10 @@
     <tr>
         <td>@_item.Id</td>
         <td><i class="@GetIconClass(_item.IsCompleted)"></i></td>
-        <td>@_item.Data</td>
+        <td>
+            @if(_item.IsCompleted) {<strike>@_item.Data</strike>}
+            else {@_item.Data}
+        </td>
     </tr>
     </tbody>
 </table>
