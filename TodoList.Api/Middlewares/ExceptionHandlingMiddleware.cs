@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics;
 using TodoList.Api.Dto;
+using TodoList.Services.Exceptions;
 
 namespace TodoList.Api.Middlewares;
 
@@ -34,7 +35,15 @@ public class ExceptionHandlingMiddleware
         var response = context.Response;
 
         response.ContentType = "application/json";
-        response.StatusCode = (int) HttpStatusCode.InternalServerError;
+
+        if (ex is CustomException customException)
+        {
+            response.StatusCode = (int)customException.ResponseStatusCode;
+        }
+        else
+        {
+            response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        }
 
         ErrorDto errorDto = new()
         {

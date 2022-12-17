@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TodoList.Infrastructure;
 using TodoList.Infrastructure.Entities;
+using TodoList.Services.Exceptions;
 
 namespace TodoList.Services.Areas.UnArchive;
 
@@ -20,7 +21,7 @@ public class UnArchiveService : IUnArchiveService
     {
         var archivedItem = await _context.ArchivedItems
             .FirstOrDefaultAsync(i => i.Id == id)
-                ?? throw new Exception($"Archived item with Id:{id} is not found!");
+                ?? throw new NotFoundException($"Archived item with Id:{id} is not found!");
 
         var item = _mapper.Map<Item>(archivedItem);
         
