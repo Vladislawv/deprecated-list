@@ -3,6 +3,7 @@ using TodoList.Infrastructure;
 using TodoList.Services.Areas;
 using TodoList.Services.Areas.Archive;
 using TodoList.Services.Areas.Items;
+using TodoList.Services.Areas.UnArchive;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,8 @@ builder.Services.AddAutoMapper(typeof(EntityDto));
 builder.Services.AddTransient<IItemService, ItemService>();
 
 builder.Services.AddTransient<IArchiveService, ArchiveService>();
+
+builder.Services.AddTransient<IUnArchiveService, UnArchiveService>();
 
 var app = builder.Build();
 

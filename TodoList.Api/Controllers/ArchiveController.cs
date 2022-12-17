@@ -48,16 +48,6 @@ public class ArchiveController : ControllerBase
 
         return Ok(archivedItem);
     }
-    
-    [HttpPut("{id:int}")]
-    [ProducesResponseType(typeof(ItemDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UnArchiveByIdAsync([FromRoute] int id)
-    {
-        var itemId = await _archiveService.UnArchiveByIdAsync(id);
-        var item = await _itemService.GetByIdAsync(itemId);
-
-        return Ok(item);
-    }
 
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
