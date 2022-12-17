@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TodoList.Services.Areas.Archive;
 using TodoList.Services.Areas.Archive.Dto;
-using TodoList.Services.Areas.Items;
-using TodoList.Services.Areas.Items.Dto;
 
 namespace TodoList.Api.Controllers;
 
@@ -13,12 +11,10 @@ namespace TodoList.Api.Controllers;
 public class ArchiveController : ControllerBase
 {
     private readonly IArchiveService _archiveService;
-    private readonly IItemService _itemService;
 
-    public ArchiveController(IArchiveService archiveService, IItemService itemService)
+    public ArchiveController(IArchiveService archiveService)
     {
         _archiveService = archiveService;
-        _itemService = itemService;
     }
 
     [HttpGet]
