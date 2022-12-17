@@ -53,22 +53,6 @@ public class ArchiveService : IArchiveService
         return archivedItem.Id;
     }
 
-    public async Task<int> UnArchiveByIdAsync(int id)
-    {
-        var archivedItem = await _context.ArchivedItems
-            .FirstOrDefaultAsync(i => i.Id == id)
-                ?? throw new Exception($"Archived item with Id:{id} is not found!");
-
-        var item = _mapper.Map<Item>(archivedItem);
-        
-        _context.ArchivedItems.Remove(archivedItem);
-        
-        await _context.Items.AddAsync(item);
-        await _context.SaveChangesAsync();
-
-        return item.Id;
-    }
-
     public async Task DeleteByIdAsync(int id)
     {
         var archivedItem = await _context.ArchivedItems
