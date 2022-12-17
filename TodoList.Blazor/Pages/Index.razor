@@ -3,6 +3,7 @@
 @inject IJSRuntime Js
 @inject NavigationManager NavManager
 @inject IItemService ItemService
+@inject IArchiveService ArchiveService
 
 <PageTitle>Index</PageTitle>
 
@@ -26,7 +27,7 @@
 else
 {
     <EditForm Model="_itemId">
-        <label for="itemId">Id</label>
+        <label for="itemId">Search by Id</label>
         <InputNumber class="form-control w-25" id="itemId" @bind-Value="_itemId"></InputNumber>
 
         <button class="btn btn-info" @onclick="GetByIdAsync"><i class="bi bi-search"></i></button>
@@ -84,6 +85,9 @@ else
                             </a>
                         </td>
                         <td>
+                            <button class="btn btn-info" @onclick="() => ArchiveByIdAsync(item.Id)">Archive</button>
+                        </td>
+                        <td>
                             <button class="btn btn-danger" @onclick="() => DeleteByIdAsync(item.Id)">
                                 <i class="bi bi-trash-fill"></i>
                             </button>
@@ -129,13 +133,22 @@ else
         await Js.InvokeVoidAsync("alert", "Item created successfully.");
     }
 
+    private async Task ArchiveByIdAsync(int id)
+    {
+        await ArchiveService.ArchiveByIdAsync(id);
+
+        _items = await ItemService.GetListAsync();
+
+        await Js.InvokeVoidAsync("alert", "Item archived successfully.");
+    }
+
     private async Task DeleteByIdAsync(int id)
     {
         await ItemService.DeleteByIdAsync(id);
         
         _items = await ItemService.GetListAsync();
 
-        await Js.InvokeVoidAsync("alert", "Item added to archive.");
+        await Js.InvokeVoidAsync("alert", "Item removed successfully.");
     }
 
     private string GetIconClass(bool isCompleted)
