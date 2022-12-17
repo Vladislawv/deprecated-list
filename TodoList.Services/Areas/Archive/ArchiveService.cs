@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using TodoList.Infrastructure;
 using TodoList.Infrastructure.Entities;
 using TodoList.Services.Areas.Archive.Dto;
+using TodoList.Services.Exceptions;
 
 namespace TodoList.Services.Areas.Archive;
 
@@ -32,7 +33,7 @@ public class ArchiveService : IArchiveService
         var archivedItem = await _context.ArchivedItems
             .ProjectTo<ArchivedDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(i => i.Id == id)
-                ?? throw new Exception($"Archived item with Id:{id} is not found!");
+                ?? throw new NotFoundException($"Archived item with Id:{id} is not found!");
 
         return archivedItem;
     }
@@ -41,7 +42,7 @@ public class ArchiveService : IArchiveService
     {
         var item = await _context.Items
             .FirstOrDefaultAsync(i => i.Id == id)
-                ?? throw new Exception($"Item with Id:{id} is not found!");
+                ?? throw new NotFoundException($"Item with Id:{id} is not found!");
 
         var archivedItem = _mapper.Map<ArchivedItem>(item);
 
@@ -57,7 +58,7 @@ public class ArchiveService : IArchiveService
     {
         var archivedItem = await _context.ArchivedItems
             .FirstOrDefaultAsync(i => i.Id == id)
-                ?? throw new Exception($"Archived item with Id:{id} is not found!");
+                ?? throw new NotFoundException($"Archived item with Id:{id} is not found!");
 
         _context.ArchivedItems.Remove(archivedItem);
         await _context.SaveChangesAsync();

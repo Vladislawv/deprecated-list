@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using TodoList.Infrastructure;
 using TodoList.Infrastructure.Entities;
 using TodoList.Services.Areas.Items.Dto;
+using TodoList.Services.Exceptions;
 
 namespace TodoList.Services.Areas.Items;
 
@@ -32,7 +33,7 @@ public class ItemService : IItemService
         var item = await _context.Items
             .ProjectTo<ItemDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(i => i.Id == id)
-                ?? throw new Exception($"Item with Id:{id} is not found !");
+                ?? throw new NotFoundException($"Item with Id:{id} is not found!");
 
         return item;
     }
@@ -51,7 +52,7 @@ public class ItemService : IItemService
     {
         var item = await _context.Items
             .FirstOrDefaultAsync(i => i.Id == id)
-                ?? throw new Exception($"Item with Id:{id} is not found !");
+                ?? throw new NotFoundException($"Item with Id:{id} is not found !");
 
         _mapper.Map(itemInput, item);
 
@@ -65,7 +66,7 @@ public class ItemService : IItemService
     {
         var item = await _context.Items
             .FirstOrDefaultAsync(i => i.Id == id)
-                ?? throw new Exception($"Item with Id:{id} is not found !");
+                ?? throw new NotFoundException($"Item with Id:{id} is not found !");
 
         _context.Items.Remove(item);
         await _context.SaveChangesAsync();
