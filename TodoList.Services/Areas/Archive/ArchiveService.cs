@@ -27,14 +27,30 @@ public class ArchiveService : IArchiveService
         return archivedItems;
     }
 
-    public async Task ArchiveAsync(Item item)
+    public async Task<ArchivedDto> GetByIdAsync(int id)
     {
+        var archivedItem = await _context.ArchivedItems
+            .ProjectTo<ArchivedDto>(_mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync(i => i.Id == id)
+                ?? throw new Exception($"Archived item with Id:{id} is not found!");
+
+        return archivedItem;
+    }
+
+    public async Task<int> ArchiveByIdAsync(int id)
+    {
+        var item = await _context.Items
+            .FirstOrDefaultAsync(i => i.Id == id)
+                ?? throw new Exception($"Item with Id:{id} is not found!");
+
         var archivedItem = _mapper.Map<ArchivedItem>(item);
-        
+
         _context.Items.Remove(item);
-        
-        _context.ArchivedItems.Add(archivedItem);
+
+        await _context.ArchivedItems.AddAsync(archivedItem);
         await _context.SaveChangesAsync();
+
+        return archivedItem.Id;
     }
 
     public async Task<int> UnArchiveByIdAsync(int id)
