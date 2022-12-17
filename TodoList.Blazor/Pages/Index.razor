@@ -1,0 +1,160 @@
+﻿@page "/"
+
+@inject IJSRuntime Js
+@inject NavigationManager NavManager
+@inject IItemService ItemService
+@inject IArchiveService ArchiveService
+
+<PageTitle>Index</PageTitle>
+
+<h1>Welcome to Todo-List !</h1>
+<h2>Here you can manage your items</h2>
+<ul>
+    <li>Mark item as done</li>
+    <li>Search item by ID</li>
+    <li>Add item to list</li>
+    <li>Update item</li>
+    <li>Delete/archive item from list</li>
+    <li>See your archived items and manage them</li>
+</ul>
+
+@if (_items == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <EditForm Model="_itemId">
+        <label for="itemId">Search by Id</label>
+        <InputNumber class="form-control w-25" id="itemId" @bind-Value="_itemId"></InputNumber>
+
+        <button class="btn btn-info" @onclick="GetByIdAsync"><i class="bi bi-search"></i></button>
+        <br/>
+        <br/>
+    </EditForm>
+    
+    <EditForm Model="_itemInput">
+        <div class="text-center">
+            <table class="w-100">
+                <thead>
+                <tr>
+                    <th>
+                        <div>
+                            <label for="data">New Item</label>
+                            <InputText class="form-control w-100" id="data" @bind-Value="_itemInput.Data"></InputText>
+                        </div>
+                    </th>
+                    <th><button class="btn btn-success" @onclick="CreateAsync">Add</button></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <br/>
+        <br/>
+
+        <h2 for="table">Current items:</h2>
+        <table class="table table-bordered table-striped" id="table">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th></th>
+                <th>Data</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in _items)
+                {
+                    <tr>
+                        <td>
+                            @item.Id
+                        </td>
+                        <td>
+                            <i class="@GetIconClass(item.IsCompleted)"></i>
+                        </td>
+                        <td>
+                            @if(item.IsCompleted) {<strike>@item.Data</strike>}
+                            else {@item.Data}
+                        </td>
+                        <td>
+                            <a href="/items/edit/@item.Id">
+                                <button class="btn btn-primary"><i class="bi bi-pencil-square"></i></button>
+                            </a>
+                        </td>
+                        <td>
+                            <button class="btn btn-info" @onclick="() => ArchiveByIdAsync(item.Id)">Archive</button>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => DeleteByIdAsync(item.Id)">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </EditForm>
+}
+
+@code
+{
+    int _itemId;
+    readonly ItemDtoInput _itemInput = new(){Data = "type text"};
+    IList<ItemDto>? _items;
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        _items = await ItemService.GetListAsync();
+    }
+
+    private async Task GetByIdAsync()
+    {
+        try
+        {
+            await ItemService.GetByIdAsync(_itemId);
+            NavManager.NavigateTo($"/items/{_itemId}");
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+    
+    private async Task CreateAsync()
+    {
+        await ItemService.CreateAsync(_itemInput);
+        
+        _items = await ItemService.GetListAsync();
+
+        await Js.InvokeVoidAsync("alert", "Item created successfully.");
+    }
+
+    private async Task ArchiveByIdAsync(int id)
+    {
+        await ArchiveService.ArchiveByIdAsync(id);
+
+        _items = await ItemService.GetListAsync();
+
+        await Js.InvokeVoidAsync("alert", "Item archived successfully.");
+    }
+
+    private async Task DeleteByIdAsync(int id)
+    {
+        await ItemService.DeleteByIdAsync(id);
+        
+        _items = await ItemService.GetListAsync();
+
+        await Js.InvokeVoidAsync("alert", "Item removed successfully.");
+    }
+
+    private string GetIconClass(bool isCompleted)
+    {
+        var iconClass = isCompleted ? "bi bi-check-square-fill" : "bi bi-check-square";
+
+        return iconClass;
+    }
+}

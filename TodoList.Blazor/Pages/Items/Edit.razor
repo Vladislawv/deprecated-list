@@ -1,0 +1,71 @@
+﻿@page "/items/edit/{Id:int}"
+
+@inject IJSRuntime Js
+@inject NavigationManager NavigationManager
+@inject IItemService ItemService
+@inject IMapper Mapper
+
+<EditForm Model="_itemInput">
+    <br/>
+    <br/>
+    
+    <div class="text-center">
+        <table class="w-100">
+            <thead>
+            <tr>
+                <th>
+                    <div>
+                        <label class="form-label" for="data">Edit data</label>
+                        <InputText class="form-control w-100" id="data" @bind-Value="_itemInput.Data"></InputText>
+                    </div>
+                </th>
+                <th>
+                    <button class="btn m-t-10 background-white"
+                            @onclick="() => _itemInput.IsCompleted = !_itemInput.IsCompleted">
+                        <i class="@GetIconClass(_itemInput.IsCompleted)"></i>
+                    </button>
+                </th>
+                <th>
+                    <button class="btn btn-primary m-t-10" @onclick="UpdateAsync">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                </th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+    <br/>
+    <br/>
+    
+    <a href="/"><button class="btn btn-info"><i class="bi bi-arrow-bar-left"></i></button></a>
+</EditForm>
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+
+    readonly ItemDtoInput? _itemInput = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var itemDto = await ItemService.GetByIdAsync(Id);
+        Mapper.Map(itemDto, _itemInput);
+    }
+
+    private async Task UpdateAsync()
+    {
+        await ItemService.UpdateByIdAsync(Id, _itemInput);
+
+        await Js.InvokeVoidAsync("alert", "Item edited successfully!");
+        
+        NavigationManager.NavigateTo("/");
+    }
+    
+    private string GetIconClass(bool isCompleted)
+    {
+        var iconClass = isCompleted ? "bi bi-check-square-fill" : "bi bi-check-square";
+
+        return iconClass;
+    }
+}
